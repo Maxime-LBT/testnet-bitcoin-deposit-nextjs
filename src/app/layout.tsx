@@ -7,7 +7,7 @@ import { Ubuntu } from "next/font/google";
 import { AntdRegistry } from "@ant-design/nextjs-registry";
 // import { Metadata } from "next";
 import Title from "antd/es/typography/Title";
-import { DownloadOutlined, GithubFilled, QuestionCircleFilled } from "@ant-design/icons";
+import { DownloadOutlined, GithubFilled } from "@ant-design/icons";
 import Wallet from "@/components/Wallet";
 import { WalletProvider } from "@/context/walletContext";
 import StyledJsxRegistry from "./registry";
@@ -85,7 +85,6 @@ export default function RootLayout({
                   </Row>
                   <Row>
                     <IconSpace>
-                      <QuestionCircleFilled style={{ color: "white", fontSize: "24px" }} />
                       <Link href={"https://github.com/Maxime-LBT/testnet-bitcoin-deposit-nextjs"}>
                         <GithubFilled style={{ color: "white", fontSize: "24px" }} />
                       </Link>
