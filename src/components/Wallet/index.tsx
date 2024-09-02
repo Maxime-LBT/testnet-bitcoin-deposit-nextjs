@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { Space, Tooltip, Button, Modal, Form, Input, Divider, Skeleton, Drawer, List, Avatar } from "antd";
+import { Space, Tooltip, Button, Modal, Form, Input, Divider, Skeleton, Drawer, List, Avatar, Badge } from "antd";
 import { ArrowDownOutlined, ArrowUpOutlined, UnorderedListOutlined, WalletOutlined } from "@ant-design/icons";
-import { useWallet } from "@/context/walletContext"; 
+import { useWallet } from "@/context/walletContext";
 import Link from "next/link";
 import styled from "styled-components";
 
@@ -41,9 +41,7 @@ const Wallet: React.FC = () => {
 
   return (
     <Space align="baseline">
-      <BalanceText>
-        {balance !== -1 ? `${balance} tBTC` : <Skeleton.Input active={true} size={"small"} />}
-      </BalanceText>
+      <BalanceText>{balance !== -1 ? `${balance} tBTC` : <Skeleton.Input active={true} size={"small"} />}</BalanceText>
       <Tooltip title="Display wallet information">
         <Button size="small" name="Display wallet information" onClick={() => setPrivateKeyVisibility(true)}>
           <WalletOutlined style={{ fontSize: "12px" }} />
@@ -74,9 +72,11 @@ const Wallet: React.FC = () => {
         </Form>
       </Modal>
       <Tooltip title="Display wallet transactions">
-        <Button type="dashed" name="Display wallet transactions" size="small" onClick={() => setTransactionsVisibility(true)}>
-          <UnorderedListOutlined />
-        </Button>
+        <Badge color="green" count={transactions.length}>
+          <Button type="dashed" name="Display wallet transactions" size="small" onClick={() => setTransactionsVisibility(true)}>
+            <UnorderedListOutlined />
+          </Button>
+        </Badge>
       </Tooltip>
       <Drawer title={`${transactions.length} Transaction${transactions.length !== 1 ? "s" : ""}`} onClose={() => setTransactionsVisibility(false)} open={isTransactionsVisible}>
         <List
