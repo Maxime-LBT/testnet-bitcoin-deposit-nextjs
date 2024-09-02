@@ -8,7 +8,7 @@ export async function POST(request: NextRequest) {
 
     // Validate input parameters
     if (!address || typeof address !== "string" || !amount || isNaN(Number(amount))) {
-      return NextResponse.json({ message: "Invalid address or amount provided", status: "error", success: false, data: null }, { status: 400 });
+      return NextResponse.json({ status: "error", success: false, data: null }, { status: 400 });
     }
 
     // Convert the provided amount in BTC to satoshis
@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
       const transactionAmountMatches = lastTransaction.vout.some((output: Vout) => output.scriptpubkey_address === address && output.value === amountInSatoshis);
 
       if (!transactionAmountMatches) {
-        return NextResponse.json({ message: "Last transaction amount does not match", status: "awaiting", success: true, data: null }, { status: 200 });
+        return NextResponse.json({ status: "awaiting", success: true, data: null }, { status: 200 });
       }
 
       // Check confirmation status
@@ -31,7 +31,6 @@ export async function POST(request: NextRequest) {
 
       return NextResponse.json(
         {
-          message: lastTransaction.status.confirmed ? "Transaction confirmed" : "Transaction detected but not confirmed",
           status: lastTransaction.status.confirmed ? "confirmed" : "unconfirmed",
           success: true,
           data: { address, amount: tBTCAmount, transactionId },
@@ -40,10 +39,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    return NextResponse.json({ message: "No relevant transactions found", status: "awaiting", success: true, data: null }, { status: 200 });
+    // Default : No relevant transactions found
+    return NextResponse.json({ status: "awaiting", success: true, data: null }, { status: 200 });
   } catch (error) {
     logger.error("Error checking payment status:", error);
-    return NextResponse.json({ message: "Internal Server Error", success: false, data: null }, { status: 500 });
+    return NextResponse.json({ success: false, data: null }, { status: 500 });
   }
 }
 
