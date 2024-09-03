@@ -78,6 +78,10 @@ Follow these steps to set up the project:
 - **Get the QR Code**: A QR code is generated for the payment request.
 - **Monitor Payment Status**: The app will automatically check for payment status and notify you once the payment is received.
 
+## Improvements
+
+- **Add env setting for the number of block confirmations to wait for before validating payment (current is 1)**
+
 ## Contributing
 
 We welcome contributions! If you'd like to contribute, please fork the repository and submit a pull request.
