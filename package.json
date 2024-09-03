@@ -12,7 +12,8 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
-    "cypress:open": "cypress open"
+    "cypress:open": "cypress open",
+    "cypress:run": "cypress run --spec \"cypress/e2e/page.cy.ts\""
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
