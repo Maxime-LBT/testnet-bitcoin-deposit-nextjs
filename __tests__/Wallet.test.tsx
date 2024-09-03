@@ -10,14 +10,15 @@ beforeAll(() => {
       matches: false,
       media: query,
       onchange: null,
-      addListener: jest.fn(), // deprecated
-      removeListener: jest.fn(), // deprecated
+      addListener: jest.fn(),
+      removeListener: jest.fn(),
       addEventListener: jest.fn(),
       removeEventListener: jest.fn(),
       dispatchEvent: jest.fn(),
     })),
   });
 });
+
 // Mock the wallet context
 jest.mock('@/context/walletContext', () => ({
   useWallet: jest.fn(),
@@ -78,7 +79,6 @@ describe('Wallet Component', () => {
   test('shows wallet modal when button is clicked', async () => {
     render(<Wallet />);
 
-    // Use act to wrap the button click event
     await act(async () => {
       const infoButton = screen.getByTitle(/display wallet information/i);
       fireEvent.click(infoButton);
@@ -87,24 +87,38 @@ describe('Wallet Component', () => {
     const modalTitle = await screen.findByText('Wallet');
     expect(modalTitle).toBeInTheDocument();
 
-    // Verify form fields
     expect(screen.getByRole('textbox', { name: 'address' })).toHaveValue('test-address');
     expect(screen.getByRole('textbox', { name: 'privateKey' })).toHaveValue('test-private-key');
     expect(screen.getByRole('textbox', { name: 'mnemonic' })).toHaveValue('test-mnemonic');
   });
 
-  test('shows transactions drawer when button is clicked', async () => {
+  test('opens and closes the transactions drawer', async () => {
     render(<Wallet />);
 
-    const transactionsButton = screen.getByTitle(/display wallet transactions/i);
-    fireEvent.click(transactionsButton);
+    // Open the transactions drawer
+    await act(async () => {
+      const transactionsButton = screen.getByTitle(/display wallet transactions/i);
+      fireEvent.click(transactionsButton);
+    });
 
+    // Check that the drawer is opened and transactions are displayed
     const drawerTitle = await screen.findByText('2 Transactions');
     expect(drawerTitle).toBeInTheDocument();
 
-    // Verify transactions in drawer
-    expect(screen.getByText(/transaction id: abcd...1234/i)).toBeInTheDocument();
-    expect(screen.getByText(/transaction id: efgh...5678/i)).toBeInTheDocument();
+    // Verify that each transaction item is displayed
+    const firstTransaction = screen.getByText(/transaction id: abcd...1234/i);
+    const secondTransaction = screen.getByText(/transaction id: efgh...5678/i);
+    expect(firstTransaction).toBeInTheDocument();
+    expect(secondTransaction).toBeInTheDocument();
+
+    // Close the transactions drawer
+    await act(async () => {
+      const closeButton = screen.getByRole('button', { name: /close/i });
+      fireEvent.click(closeButton);
+    });
+
+    // Ensure the drawer is closed
+    expect(screen.queryByText('2 Transactions')).not.toBeInTheDocument();
   });
 
   test('fetches and displays balance and transactions correctly', async () => {
@@ -112,8 +126,10 @@ describe('Wallet Component', () => {
 
     await waitFor(() => expect(screen.getByText('3 tBTC')).toBeInTheDocument());
 
-    const transactionsButton = screen.getByTitle(/display wallet transactions/i);
-    fireEvent.click(transactionsButton);
+    await act(async () => {
+      const transactionsButton = screen.getByTitle(/display wallet transactions/i);
+      fireEvent.click(transactionsButton);
+    });
 
     const receivedTransaction = await screen.findByText('Transaction ID: abcd...1234');
     const sentTransaction = await screen.findByText('Transaction ID: efgh...5678');
@@ -124,48 +140,41 @@ describe('Wallet Component', () => {
   test('inputs are read-only and cannot be changed', async () => {
     render(<Wallet />);
 
-    // Open the wallet modal
-    const infoButton = screen.getByTitle(/display wallet information/i);
-    fireEvent.click(infoButton);
+    await act(async () => {
+      const infoButton = screen.getByTitle(/display wallet information/i);
+      fireEvent.click(infoButton);
+    });
 
-    // Verify form fields are read-only
     const addressInput = screen.getByRole('textbox', { name: 'address' });
     const privateKeyInput = screen.getByRole('textbox', { name: 'privateKey' });
     const mnemonicInput = screen.getByRole('textbox', { name: 'mnemonic' });
 
-    // Attempt to change the values
     fireEvent.change(addressInput, { target: { value: 'new-address' } });
     fireEvent.change(privateKeyInput, { target: { value: 'new-private-key' } });
     fireEvent.change(mnemonicInput, { target: { value: 'new-mnemonic' } });
 
-    // Verify that the values did not change
     expect(addressInput).toHaveValue('test-address');
     expect(privateKeyInput).toHaveValue('test-private-key');
     expect(mnemonicInput).toHaveValue('test-mnemonic');
   });
 
   test('fetches balance periodically and updates state', async () => {
-    jest.useFakeTimers(); // Use fake timers to control the setInterval
+    jest.useFakeTimers();
 
     render(<Wallet />);
 
-    // Run all pending timers (to simulate the initial interval)
     await act(async () => {
       jest.runOnlyPendingTimers();
     });
 
-    // Assert that the fetch is called with the correct URL after the first interval
     await waitFor(() => expect(global.fetch).toHaveBeenCalledWith('/api/wallet/test-address'));
 
-    // Run all pending timers again to simulate another interval
     await act(async () => {
       jest.runOnlyPendingTimers();
     });
 
-    // Assert that fetch has been called twice (initial call and after one interval)
     expect(global.fetch).toHaveBeenCalledTimes(2);
 
-    // Clean up timers
     jest.useRealTimers();
   });
 });
