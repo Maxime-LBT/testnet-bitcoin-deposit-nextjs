@@ -57,8 +57,14 @@ jobs:
             - name: Build Next.js app
               run: yarn build
 
+            - name: Start Next.js server
+              run: yarn run start
+
+            - name: Wait for Next.js to be ready
+              run: npx wait-on http://localhost:3000
+
             - name: Run Cypress tests
-              run: yarn cypress run --spec "cypress/e2e/page.cy.ts"
+              run: yarn run cypress:run
 
             - name: Deploy to Vercel
               env:
