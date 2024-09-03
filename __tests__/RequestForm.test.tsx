@@ -2,11 +2,10 @@ import React from 'react';
 import { render, fireEvent, screen, act } from '@testing-library/react';
 import RequestForm from '@/components/RequestForm';
 
-
 beforeAll(() => {
   Object.defineProperty(window, 'matchMedia', {
     writable: true,
-    value: jest.fn().mockImplementation(query => ({
+    value: jest.fn().mockImplementation((query) => ({
       matches: false,
       media: query,
       onchange: null,
@@ -37,35 +36,50 @@ describe('RequestForm Component', () => {
 
     // Simulate user input
     const inputElement = screen.getByPlaceholderText('0.0001');
-    
+
     // Use act to wrap the state update
     await act(async () => {
-      fireEvent.change(inputElement, { target: { value: 0.005 } });
+      fireEvent.change(inputElement, { target: { value: '0.005' } });
     });
 
     // Simulate form submission
     const buttonElement = screen.getByText(/Generate Payment QR Code/i);
-    
+
     await act(async () => {
       fireEvent.click(buttonElement);
     });
 
     // Check if handleSubmit was called with the correct amount
-    expect(handleSubmit).toHaveBeenCalledWith("0.005");
+    expect(handleSubmit).toHaveBeenCalledWith('0.005');
   });
 
   test('displays validation error when input is empty', async () => {
     render(<RequestForm onSubmit={jest.fn()} />);
 
-    // Simulate form submission without entering input
     const buttonElement = screen.getByText(/Generate Payment QR Code/i);
-    
     await act(async () => {
       fireEvent.click(buttonElement);
     });
 
-    // Check if validation error message is displayed
     const errorMessage = await screen.findByText(/Please input the amount!/i);
     expect(errorMessage).toBeInTheDocument();
+  });
+
+  test('updates amount state on input change', async () => {
+    render(<RequestForm onSubmit={jest.fn()} />);
+
+    const inputElement = screen.getByPlaceholderText('0.0001');
+
+    // Change to a valid value
+    await act(async () => {
+      fireEvent.change(inputElement, { target: { value: '0.01' } });
+    });
+    expect((inputElement as HTMLInputElement).value).toBe('0.01');
+
+    // Change to an invalid value
+    await act(async () => {
+      fireEvent.change(inputElement, { target: { value: 'invalid' } });
+    });
+    expect((inputElement as HTMLInputElement).value).toBe(''); // Expect the fallback value of 0
   });
 });
