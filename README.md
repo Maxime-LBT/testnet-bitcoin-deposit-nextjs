@@ -94,13 +94,26 @@ To ensure the application functions correctly, follow these steps to run the tes
 
 This will execute all the unit, integration and e2e tests for the application. The test results will be displayed in your terminal, showing which tests passed or failed.
 
+## Deployment
+
+To deploy the application, follow these steps:
+
+1. Fork this repository to your GitHub account.
+
+2. Set up a Vercel account if you haven't already.
+
+3. Connect your GitHub account to Vercel.
+
+4. Fill the Vercel token on Github Secrets
+
+The GitHub Action will automatically deploy your application to Vercel whenever changes are pushed to the `main` branch.
+
 
 ## How to Use
 
-- **Generate a New Wallet**: The app automatically generates a new HD wallet upon startup.
 - **Enter Payment Amount**: Use the provided form to specify the amount of BTC you wish to pay.
 - **Get the QR Code**: A QR code is generated for the payment request.
-- **Monitor Payment Status**: The app will automatically check for payment status and notify you once the payment is received.
+- **Get back your testnet BTC**: The private key / mnemonic is generated on the server and will be displayed.
 
 ## Improvements
 
