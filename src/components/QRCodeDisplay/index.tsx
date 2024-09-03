@@ -32,6 +32,19 @@ const RightAlignedCol = styled(Col)`
     text-align: right;
 `;
 
+const StyledQRCode = styled(QRCode)`
+    width: 100%;
+    height: auto;
+`;
+
+const QRCodeWrapper = styled(Col)`
+    span {
+        display: block;
+        margin-top: 10px;
+        text-align: center;
+    }
+`;
+
 const QRCodeDisplay: React.FC<QRCodeDisplayProps> = ({ value, amount }) => {
     const copyToClipboard = () => {
         navigator.clipboard.writeText(value);
@@ -52,10 +65,10 @@ const QRCodeDisplay: React.FC<QRCodeDisplayProps> = ({ value, amount }) => {
                     </RightAlignedCol>
                 </FullWidthRow>
             </StyledCol>
-            <Col span={12} offset={6}>
-                <QRCode value={value} style={{ width: '100%', height: 'auto' }} />
-                Scan and send {amount} BTC
-            </Col>
+            <QRCodeWrapper span={12} offset={6}>
+                <StyledQRCode id="qr-code-display" name="qr-code-display" value={value} />
+                <span>Scan and send {amount} BTC</span>
+            </QRCodeWrapper>
         </StyledRow>
     );
 };
