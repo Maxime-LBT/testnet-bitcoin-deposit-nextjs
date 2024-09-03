@@ -2,6 +2,10 @@
 
 This is a simple Next.js application that allows users to generate testnet Bitcoin payment requests, display a QR code for the payment, and check the payment status in real-time.
 
+## Demo
+
+You can try out the live demo of the application at: https://bitcoin-request-nise955cq-autoraz.vercel.app/
+
 ## Key Features
 
 - **Generate HD Wallet**: Automatically creates a new HD (Hierarchical Deterministic) wallet every time the server is restarted or the page is reloaded.
@@ -100,7 +104,8 @@ This will execute all the unit, integration and e2e tests for the application. T
 
 ## Improvements
 
-- **Add env setting for the number of block confirmations to wait for before validating payment (current is 1)**
+- Add env setting for the number of block confirmations to wait for before validating payment (current is 1)
+- Payment will be confirmed if the last transaction is the same amout : create a new wallet for each payment request or use memo/label 
 
 ## Contributing
 
