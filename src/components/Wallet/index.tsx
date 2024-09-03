@@ -98,10 +98,8 @@ const Wallet: React.FC = () => {
                                 }
                                 title={
                                     <Link href={`https://blockstream.info/tx/${item.txid}`} target="_blank">
-                                        Transaction ID: {item.txid.slice(0, 4)}...{item.txid.slice(-4)} <br/>
-                                        <span style={{ color: item.confirmed ? 'green' : 'red' }}>
-                                            {item.confirmed ? 'Confirmed' : 'Unconfirmed'}
-                                        </span>
+                                        Transaction ID: {item.txid.slice(0, 4)}...{item.txid.slice(-4)} <br />
+                                        <span style={{ color: item.confirmed ? 'green' : 'red' }}>{item.confirmed ? 'Confirmed' : 'Unconfirmed'}</span>
                                     </Link>
                                 }
                                 description={`Amount: ${item.amount} tBTC `}
