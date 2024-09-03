@@ -27,12 +27,16 @@ const RequestForm: React.FC<RequestFormProps> = ({ onSubmit }) => {
     onSubmit(values.amount);
   };
 
+  const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setAmount(parseFloat(e.target.value) || 0);
+  };
+
   return (
     <StyledRow align="middle" justify="center">
       <StyledCol span={24}>
         <Form layout="vertical" onFinish={handleSubmit}>
           <Form.Item label="Enter the amount you want to deposit:" name="amount" rules={[{ required: true, message: "Please input the amount!" }]}>
-            <Input suffix="tBTC" type="number" step="0.0001" min="0.0001" size="middle" value={amount} onChange={(e) => setAmount(parseFloat(e.target.value) || 0)} placeholder="0.0001" />
+            <Input suffix="tBTC" type="number" step="0.0001" min="0.0001" size="middle" value={amount} onChange={handleAmountChange} placeholder="0.0001" />
           </Form.Item>
           <Form.Item>
             <StyledButton type="primary" htmlType="submit" size="middle">
