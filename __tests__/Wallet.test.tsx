@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import Wallet from '@/components/Wallet';
 import { useWallet } from '@/context/walletContext';
 
@@ -78,8 +78,11 @@ describe('Wallet Component', () => {
   test('shows wallet modal when button is clicked', async () => {
     render(<Wallet />);
 
-    const infoButton = screen.getByTitle(/display wallet information/i);
-    fireEvent.click(infoButton);
+    // Use act to wrap the button click event
+    await act(async () => {
+      const infoButton = screen.getByTitle(/display wallet information/i);
+      fireEvent.click(infoButton);
+    });
 
     const modalTitle = await screen.findByText('Wallet');
     expect(modalTitle).toBeInTheDocument();
@@ -139,5 +142,30 @@ describe('Wallet Component', () => {
     expect(addressInput).toHaveValue('test-address');
     expect(privateKeyInput).toHaveValue('test-private-key');
     expect(mnemonicInput).toHaveValue('test-mnemonic');
+  });
+
+  test('fetches balance periodically and updates state', async () => {
+    jest.useFakeTimers(); // Use fake timers to control the setInterval
+
+    render(<Wallet />);
+
+    // Run all pending timers (to simulate the initial interval)
+    await act(async () => {
+      jest.runOnlyPendingTimers();
+    });
+
+    // Assert that the fetch is called with the correct URL after the first interval
+    await waitFor(() => expect(global.fetch).toHaveBeenCalledWith('/api/wallet/test-address'));
+
+    // Run all pending timers again to simulate another interval
+    await act(async () => {
+      jest.runOnlyPendingTimers();
+    });
+
+    // Assert that fetch has been called twice (initial call and after one interval)
+    expect(global.fetch).toHaveBeenCalledTimes(2);
+
+    // Clean up timers
+    jest.useRealTimers();
   });
 });
