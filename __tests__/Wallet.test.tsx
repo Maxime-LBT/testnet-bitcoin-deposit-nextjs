@@ -117,4 +117,27 @@ describe('Wallet Component', () => {
     expect(receivedTransaction).toBeInTheDocument();
     expect(sentTransaction).toBeInTheDocument();
   });
+
+  test('inputs are read-only and cannot be changed', async () => {
+    render(<Wallet />);
+
+    // Open the wallet modal
+    const infoButton = screen.getByTitle(/display wallet information/i);
+    fireEvent.click(infoButton);
+
+    // Verify form fields are read-only
+    const addressInput = screen.getByRole('textbox', { name: 'address' });
+    const privateKeyInput = screen.getByRole('textbox', { name: 'privateKey' });
+    const mnemonicInput = screen.getByRole('textbox', { name: 'mnemonic' });
+
+    // Attempt to change the values
+    fireEvent.change(addressInput, { target: { value: 'new-address' } });
+    fireEvent.change(privateKeyInput, { target: { value: 'new-private-key' } });
+    fireEvent.change(mnemonicInput, { target: { value: 'new-mnemonic' } });
+
+    // Verify that the values did not change
+    expect(addressInput).toHaveValue('test-address');
+    expect(privateKeyInput).toHaveValue('test-private-key');
+    expect(mnemonicInput).toHaveValue('test-mnemonic');
+  });
 });
