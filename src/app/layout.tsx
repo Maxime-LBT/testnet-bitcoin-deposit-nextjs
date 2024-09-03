@@ -81,7 +81,7 @@ export default function RootLayout({
                                     </SpaceRow>
                                     <SpaceRow>
                                         <Space>
-                                            <Link href={'https://github.com/Maxime-LBT/testnet-bitcoin-deposit-nextjs'}>
+                                            <Link href={'https://github.com/Maxime-LBT/testnet-bitcoin-deposit-nextjs'} about="_blank">
                                                 <GithubFilled style={{ color: 'white', fontSize: '24px' }} />
                                             </Link>
                                         </Space>
