@@ -88,10 +88,10 @@ const Home: React.FC = () => {
         setBtcAmount(amount); // Store the BTC amount
         setPaymentRequest(`bitcoin:${wallet.address}?amount=${amount}`);
         setCurrentStep('showQRCode'); // Move to the next step to show the QR code
-        pollPaymentStatus(wallet.address, amount);
+        pollPaymentStatus(wallet.address, amount, new Date().getTime());
     };
 
-    const pollPaymentStatus = (address: string, amount: number) => {
+    const pollPaymentStatus = (address: string, amount: number, qrGeneratedTime: number) => {
         if (intervalRef.current) {
             clearInterval(intervalRef.current);
         }
@@ -103,7 +103,7 @@ const Home: React.FC = () => {
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ address, amount }),
+                    body: JSON.stringify({ address, amount, qrGeneratedTime }),
                 });
 
                 if (!response.ok) {
@@ -163,10 +163,9 @@ const Home: React.FC = () => {
                     {currentStep === 'showQRCode' && (
                         <QRCodeWrapper>
                             <QRCodeDisplay value={paymentRequest} amount={btcAmount} />
-                            <Button key="go-back" type="primary" onClick={handleBack}>
+                            <Button key="go-back" type="primary" onClick={handleBack} style={{ marginTop: '10px' }}>
                                 Go back
                             </Button>
-                            ,
                         </QRCodeWrapper>
                     )}
                     {currentStep === 'unconfirmed' && (
