@@ -1,5 +1,5 @@
 #!/bin/sh
-. "$(dirname "$0")/_/husky.sh"
+. "$(dirname "$0")/husky.sh"
 
 npx validate-branch-name
-npx lint-staged
+npx next lint --fix
