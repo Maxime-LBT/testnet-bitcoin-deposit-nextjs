@@ -17,6 +17,7 @@ const ubuntu = Ubuntu({ subsets: ['latin'], weight: '300' });
 
 const StyledCol = styled(Col)`
     width: 100%;
+    margin-top: 5%;
 `;
 
 const TitleCol = styled(Col)`
@@ -50,7 +51,7 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en" className={ubuntu.className}>
-            <body style={{ backgroundColor: '#0a192f', height: '100vh', margin: '0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <body style={{ backgroundColor: '#0a192f', height: '100vh', margin: '0', display: 'flex'}}>
                 <StyledJsxRegistry>
                     <AntdRegistry>
                         <WalletProvider>
