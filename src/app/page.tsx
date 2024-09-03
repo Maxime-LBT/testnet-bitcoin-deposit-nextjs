@@ -88,10 +88,10 @@ const Home: React.FC = () => {
         setBtcAmount(amount); // Store the BTC amount
         setPaymentRequest(`bitcoin:${wallet.address}?amount=${amount}`);
         setCurrentStep('showQRCode'); // Move to the next step to show the QR code
-        pollPaymentStatus(wallet.address, amount, new Date().getTime());
+        pollPaymentStatus(wallet.address, amount);
     };
 
-    const pollPaymentStatus = (address: string, amount: number, qrGeneratedTime: number) => {
+    const pollPaymentStatus = (address: string, amount: number) => {
         if (intervalRef.current) {
             clearInterval(intervalRef.current);
         }
@@ -103,7 +103,7 @@ const Home: React.FC = () => {
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ address, amount, qrGeneratedTime }),
+                    body: JSON.stringify({ address, amount }),
                 });
 
                 if (!response.ok) {
@@ -163,8 +163,14 @@ const Home: React.FC = () => {
                     {currentStep === 'showQRCode' && (
                         <QRCodeWrapper>
                             <QRCodeDisplay value={paymentRequest} amount={btcAmount} />
-                            <Button key="go-back" type="primary" onClick={handleBack} style={{ marginTop: '10px' }}>
-                                Go back
+                            <Button
+                                key="cancel-transaction"
+                                id="cancel-transaction"
+                                type="primary"
+                                style={{ backgroundColor: '#f5222d', borderColor: '#f5222d', marginTop: '10px' }}
+                                onClick={handleBack}
+                            >
+                                Cancel
                             </Button>
                         </QRCodeWrapper>
                     )}
