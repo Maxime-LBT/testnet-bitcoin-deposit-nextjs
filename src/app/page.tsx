@@ -138,7 +138,6 @@ const Home: React.FC = () => {
                     }
                 }
             } catch (error) {
-                console.error('Error checking payment status:', error);
                 setCurrentStep('error');
                 clearInterval(intervalRef.current!);
             }
@@ -209,7 +208,7 @@ const Home: React.FC = () => {
                                             </Link>
                                         </Button>,
                                         <Button key="deposit" onClick={handleBack}>
-                                            Deposit Again
+                                            Deposit again
                                         </Button>,
                                     ]}
                                 />
@@ -219,7 +218,16 @@ const Home: React.FC = () => {
                     {currentStep === 'error' && (
                         <CenteredRow>
                             <Col span={24}>
-                                <Result status="error" title="Transaction Error" subTitle="A problem was encountered while processing your payment. Please try again later." />
+                                <Result
+                                    status="error"
+                                    title="Transaction Error"
+                                    subTitle="A problem was encountered while processing your payment. Please try again later."
+                                    extra={[
+                                        <Button key="deposit" onClick={handleBack}>
+                                            Try again
+                                        </Button>,
+                                    ]}
+                                />
                             </Col>
                         </CenteredRow>
                     )}
