@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from "react";
-import { Space, Tooltip, Button, Modal, Form, Input, Divider, Skeleton, Drawer, List, Avatar, Badge } from "antd";
-import { ArrowDownOutlined, ArrowUpOutlined, UnorderedListOutlined, WalletOutlined } from "@ant-design/icons";
-import { useWallet } from "@/context/walletContext";
-import Link from "next/link";
-import styled from "styled-components";
+import React, { useEffect, useState } from 'react';
+import { Space, Tooltip, Button, Modal, Form, Input, Divider, Skeleton, Drawer, List, Avatar, Badge } from 'antd';
+import { ArrowDownOutlined, ArrowUpOutlined, UnorderedListOutlined, WalletOutlined } from '@ant-design/icons';
+import { useWallet } from '@/context/walletContext';
+import Link from 'next/link';
+import styled from 'styled-components';
 
 const BalanceText = styled.span`
   color: white;
@@ -41,16 +41,16 @@ const Wallet: React.FC = () => {
 
   return (
     <Space align="baseline">
-      <BalanceText>{balance !== -1 ? `${balance} tBTC` : <Skeleton.Input active={true} size={"small"} />}</BalanceText>
+      <BalanceText>{balance !== -1 ? `${balance} tBTC` : <Skeleton.Input active={true} size={'small'} />}</BalanceText>
       <Tooltip title="Display wallet information">
-        <Button size="small" name="Display wallet information" onClick={() => setPrivateKeyVisibility(true)}>
-          <WalletOutlined style={{ fontSize: "12px" }} />
+        <Button size="small" title="Display wallet information" name="Display wallet information" onClick={() => setPrivateKeyVisibility(true)}>
+          <WalletOutlined style={{ fontSize: '12px' }} />
         </Button>
       </Tooltip>
       <Modal
         title={
           <Space align="baseline">
-            <WalletOutlined style={{ fontSize: "20px" }} />
+            <WalletOutlined style={{ fontSize: '20px' }} />
             <WalletTitle>Wallet</WalletTitle>
           </Space>
         }
@@ -60,31 +60,31 @@ const Wallet: React.FC = () => {
       >
         <Divider />
         <Form layout="vertical">
-          <Form.Item label={<strong>Address</strong>}>
-            <Input.TextArea value={wallet.address || "No wallet address available"} readOnly />
+          <Form.Item htmlFor="address" label={<strong>Address</strong>}>
+            <Input.TextArea name="address" aria-label="address" value={wallet.address || 'No wallet address available'} readOnly />
           </Form.Item>
-          <Form.Item label={<strong>Private Key</strong>}>
-            <Input.TextArea value={wallet.privateKey || "No private key available"} readOnly />
+          <Form.Item htmlFor="privateKey" label={<strong>Private Key</strong>}>
+            <Input.TextArea name="privateKey" aria-label="privateKey" value={wallet.privateKey || 'No private key available'} readOnly />
           </Form.Item>
-          <Form.Item label={<strong>Mnemonic</strong>}>
-            <Input.TextArea value={wallet.mnemonic || "No mnemonic available"} readOnly />
+          <Form.Item htmlFor="mnemonic" label={<strong>Mnemonic</strong>}>
+            <Input.TextArea name="mnemonic" aria-label="mnemonic" value={wallet.mnemonic || 'No mnemonic available'} readOnly />
           </Form.Item>
         </Form>
       </Modal>
       <Tooltip title="Display wallet transactions">
         <Badge color="green" count={transactions.length}>
-          <Button type="dashed" name="Display wallet transactions" size="small" onClick={() => setTransactionsVisibility(true)}>
+          <Button type="dashed" title="Display wallet transactions" name="Display wallet transactions" size="small" onClick={() => setTransactionsVisibility(true)}>
             <UnorderedListOutlined />
           </Button>
         </Badge>
       </Tooltip>
-      <Drawer title={`${transactions.length} Transaction${transactions.length !== 1 ? "s" : ""}`} onClose={() => setTransactionsVisibility(false)} open={isTransactionsVisible}>
+      <Drawer title={`${transactions.length} Transaction${transactions.length !== 1 ? 's' : ''}`} onClose={() => setTransactionsVisibility(false)} open={isTransactionsVisible}>
         <List
           dataSource={transactions}
           renderItem={(item) => (
             <List.Item>
               <List.Item.Meta
-                avatar={<Avatar style={{ backgroundColor: item.direction === "Received" ? "green" : "red" }}>{item.direction === "Received" ? <ArrowDownOutlined /> : <ArrowUpOutlined />}</Avatar>}
+                avatar={<Avatar style={{ backgroundColor: item.direction === 'Received' ? 'green' : 'red' }}>{item.direction === 'Received' ? <ArrowDownOutlined /> : <ArrowUpOutlined />}</Avatar>}
                 title={
                   <Link href={`https://blockstream.info/testnet/tx/${item.txid}`} target="_blank">
                     Transaction ID: {item.txid.slice(0, 4)}...{item.txid.slice(-4)}
