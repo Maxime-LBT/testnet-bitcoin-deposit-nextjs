@@ -17,6 +17,7 @@ const WalletTitle = styled.span`
 
 interface Transaction {
     txid: string;
+    confirmed: boolean;
     direction: 'Sent' | 'Received' | 'Unknown';
     amount: number;
 }
@@ -100,7 +101,7 @@ const Wallet: React.FC = () => {
                                         Transaction ID: {item.txid.slice(0, 4)}...{item.txid.slice(-4)}
                                     </Link>
                                 }
-                                description={`Amount: ${item.amount} tBTC`}
+                                description={`Amount: ${item.amount} tBTC - ${item.confirmed ? 'Confirmed' : 'Unconfirmed'}`}
                             />
                         </List.Item>
                     )}
