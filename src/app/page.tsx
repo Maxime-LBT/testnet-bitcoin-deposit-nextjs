@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import RequestForm from '@/components/RequestForm';
 import QRCodeDisplay from '@/components/QRCodeDisplay';
@@ -56,6 +56,15 @@ const Home: React.FC = () => {
     const [paymentRequest, setPaymentRequest] = useState<string>('');
     const [btcAmount, setBtcAmount] = useState<number>(0);
     const [transaction, setTransaction] = useState<string | null>(null);
+    const intervalRef = useRef<NodeJS.Timeout | null>(null);
+
+    useEffect(() => {
+        return () => {
+            if (intervalRef.current) {
+                clearInterval(intervalRef.current);
+            }
+        };
+    }, []);
 
     const handleFormSubmit = (amount: number) => {
         if (!wallet.address) {
@@ -83,7 +92,11 @@ const Home: React.FC = () => {
     };
 
     const pollPaymentStatus = (address: string, amount: number) => {
-        const interval = setInterval(async () => {
+        if (intervalRef.current) {
+            clearInterval(intervalRef.current);
+        }
+
+        intervalRef.current = setInterval(async () => {
             try {
                 const response = await fetch(`/api/payment/status`, {
                     method: 'POST',
@@ -112,22 +125,22 @@ const Home: React.FC = () => {
                         case 'confirmed':
                             setTransaction(data.data.transactionId);
                             setCurrentStep('confirmed');
-                            clearInterval(interval);
+                            clearInterval(intervalRef.current!);
                             break;
                         case 'error':
                             setCurrentStep('error');
-                            clearInterval(interval);
+                            clearInterval(intervalRef.current!);
                             break;
                         default:
                             setCurrentStep('error');
-                            clearInterval(interval);
+                            clearInterval(intervalRef.current!);
                             break;
                     }
                 }
             } catch (error) {
                 console.error('Error checking payment status:', error);
                 setCurrentStep('error');
-                clearInterval(interval);
+                clearInterval(intervalRef.current!);
             }
         }, Number(process.env.NEXT_PUBLIC_POLLING_INTERVAL)); // Use environment variable for polling interval
     };
@@ -135,8 +148,10 @@ const Home: React.FC = () => {
     // Function to handle going back to the previous step
     const handleBack = () => {
         setCurrentStep('enterAmount');
+        if (intervalRef.current) {
+            clearInterval(intervalRef.current);
+        }
     };
-
     const renderContent = () => {
         if (!wallet.address) {
             return <LoadingIcon />;
@@ -144,10 +159,14 @@ const Home: React.FC = () => {
             return <RequestForm onSubmit={handleFormSubmit} />;
         } else {
             return (
-                <MotionDiv key={currentStep} initial={{ x: -100, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: 100, opacity: 0 }} transition={{ duration: 0.1 }}>
+                <MotionDiv key={currentStep} initial={{ x: -100, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.1, exit: { duration: 0.0 } }}>
                     {currentStep === 'showQRCode' && (
                         <QRCodeWrapper>
                             <QRCodeDisplay value={paymentRequest} amount={btcAmount} />
+                            <Button key="go-back" type="primary" onClick={handleBack}>
+                                Go back
+                            </Button>
+                            ,
                         </QRCodeWrapper>
                     )}
                     {currentStep === 'unconfirmed' && (
@@ -159,9 +178,12 @@ const Home: React.FC = () => {
                                     subTitle="Waiting for confirmation, please wait..."
                                     extra={[
                                         <Button type="primary" key="console">
-                                            <Link href={`https://blockstream.info/testnet/tx/${transaction}`} target="_blank">
+                                            <Link href={`https://blockstream.info/tx/${transaction}`} target="_blank">
                                                 See transaction
                                             </Link>
+                                        </Button>,
+                                        <Button key="deposit" onClick={handleBack}>
+                                            Deposit Again
                                         </Button>,
                                     ]}
                                 />
@@ -177,7 +199,7 @@ const Home: React.FC = () => {
                                     subTitle={`Your payment of ${btcAmount} tBTC has been successfully confirmed.`}
                                     extra={[
                                         <Button type="primary" key="console">
-                                            <Link href={`https://blockstream.info/testnet/tx/${transaction}`} target="_blank">
+                                            <Link href={`https://blockstream.info/tx/${transaction}`} target="_blank">
                                                 See transaction
                                             </Link>
                                         </Button>,
