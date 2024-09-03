@@ -23,7 +23,7 @@ describe('RequestForm Component', () => {
     render(<RequestForm onSubmit={jest.fn()} />);
 
     // Check if the input and button are present in the document
-    const inputElement = screen.getByPlaceholderText('0.0001');
+    const inputElement = screen.getByPlaceholderText('0.00001');
     const buttonElement = screen.getByText(/Generate Payment QR Code/i);
 
     expect(inputElement).toBeInTheDocument();
@@ -35,7 +35,7 @@ describe('RequestForm Component', () => {
     render(<RequestForm onSubmit={handleSubmit} />);
 
     // Simulate user input
-    const inputElement = screen.getByPlaceholderText('0.0001');
+    const inputElement = screen.getByPlaceholderText('0.00001');
 
     // Use act to wrap the state update
     await act(async () => {
@@ -68,7 +68,7 @@ describe('RequestForm Component', () => {
   test('updates amount state on input change', async () => {
     render(<RequestForm onSubmit={jest.fn()} />);
 
-    const inputElement = screen.getByPlaceholderText('0.0001');
+    const inputElement = screen.getByPlaceholderText('0.00001');
 
     // Change to a valid value
     await act(async () => {
