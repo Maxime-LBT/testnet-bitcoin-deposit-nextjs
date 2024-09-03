@@ -73,23 +73,20 @@ export async function GET(_request: NextRequest, context: { params: Params }) {
         // Convert balance to BTC and format to 8 decimal places
         const formattedBalance = (balanceSatoshis / 1e8).toFixed(8);
 
-        // Filter and map confirmed transactions
-        const transactions = transactionsResponse.data
-            .filter((tx: Transaction) => tx.status.confirmed)
-            .map((tx: Transaction) => {
-                const isSender = tx.vin.some((input) => input.prevout.scriptpubkey_address === address);
-                const isReceiver = tx.vout.some((output) => output.scriptpubkey_address === address);
+        // Map transactions and include confirmed status
+        const transactions = transactionsResponse.data.map((tx: Transaction) => {
+            const isSender = tx.vin.some((input) => input.prevout.scriptpubkey_address === address);
+            const isReceiver = tx.vout.some((output) => output.scriptpubkey_address === address);
+            const receivedAmountBTC = tx.vout.filter((output) => output.scriptpubkey_address === address).reduce((sum, output) => sum + output.value, 0) / 1e8;
+            const sentAmountBTC = tx.vin.filter((input) => input.prevout.scriptpubkey_address === address).reduce((sum, input) => sum + input.prevout.value, 0) / 1e8;
 
-                const receivedAmountBTC = tx.vout.filter((output) => output.scriptpubkey_address === address).reduce((sum, output) => sum + output.value, 0) / 1e8;
-
-                const sentAmountBTC = tx.vin.filter((input) => input.prevout.scriptpubkey_address === address).reduce((sum, input) => sum + input.prevout.value, 0) / 1e8;
-
-                return {
-                    txid: tx.txid,
-                    direction: isSender ? 'Sent' : isReceiver ? 'Received' : 'Unknown',
-                    amount: isSender ? -sentAmountBTC : receivedAmountBTC,
-                };
-            });
+            return {
+                txid: tx.txid,
+                direction: isSender ? 'Sent' : isReceiver ? 'Received' : 'Unknown',
+                amount: isSender ? -sentAmountBTC : receivedAmountBTC,
+                confirmed: tx.status.confirmed,
+            };
+        });
 
         return NextResponse.json({ message: 'OK', data: { balance: formattedBalance, transactions } }, { status: 200 });
     } catch (error) {
