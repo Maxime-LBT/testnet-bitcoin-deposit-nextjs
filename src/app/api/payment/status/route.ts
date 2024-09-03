@@ -7,7 +7,7 @@ export async function POST(request: NextRequest) {
         const { address, amount, qrGeneratedTime } = await request.json();
 
         // Validate input parameters
-        if (!address || typeof address !== 'string' || !amount || isNaN(Number(amount)) || !qrGeneratedTime || isNaN(Number(qrGeneratedTime))) {
+        if (!address || typeof address !== 'string' || !amount || isNaN(Number(amount))) {
             logger.error('Invalid input parameters:', { address, amount, qrGeneratedTime });
             return NextResponse.json({ status: 'error', success: false, data: null }, { status: 400 });
         }
@@ -18,11 +18,10 @@ export async function POST(request: NextRequest) {
         // Fetch transactions for the given address
         const { data: transactions } = await axios.get(`${process.env.EXPLORER_API_URL}/address/${address}/txs`);
 
-        // Find the transaction with the exact amount and address, and ensure block_time is after qrGeneratedTime
+        // Find the transaction with the exact amount
         const matchingTransaction = transactions.find((tx: Transaction) => {
             const isAmountAndAddressMatch = tx.vout.some((output: Vout) => output.scriptpubkey_address === address && output.value === amountInSatoshis);
-            const isAfterQrTime = tx.status.block_time * 1000 > qrGeneratedTime; // Convert block_time to milliseconds
-            return isAmountAndAddressMatch && isAfterQrTime;
+            return isAmountAndAddressMatch;
         });
 
         if (matchingTransaction) {
