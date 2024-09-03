@@ -1,3 +1,5 @@
+import { cy } from 'local-cypress';
+
 describe('Home Page Payment Flow', () => {
     beforeEach(() => {
         // Visit the page before each test
