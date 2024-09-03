@@ -33,8 +33,8 @@ const QRCodeWrapper = styled.div`
 
 const LoadingIcon = styled(LoadingOutlined)`
   font-size: 64px;
-  color: #1677ff;
-  margin-top: 100px;
+  color: #1677ff !important;
+  margin-top: 50px;
 `;
 
 const MotionDiv = styled(motion.div)`
@@ -125,8 +125,8 @@ const Home: React.FC = () => {
           }
         }
       } catch (error) {
-        setCurrentStep("error");
         console.error("Error checking payment status:", error);
+        setCurrentStep("error");
         clearInterval(interval);
       }
     }, Number(process.env.NEXT_PUBLIC_POLLING_INTERVAL)); // Use environment variable for polling interval
@@ -144,13 +144,7 @@ const Home: React.FC = () => {
       return <RequestForm onSubmit={handleFormSubmit} />;
     } else {
       return (
-        <MotionDiv
-          key={currentStep}
-          initial={{ x: -100, opacity: 0 }}
-          animate={{ x: 0, opacity: 1 }}
-          exit={{ x: 100, opacity: 0 }}
-          transition={{ duration: 0.1 }}
-        >
+        <MotionDiv key={currentStep} initial={{ x: -100, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: 100, opacity: 0 }} transition={{ duration: 0.1 }}>
           {currentStep === "showQRCode" && (
             <QRCodeWrapper>
               <QRCodeDisplay value={paymentRequest} amount={btcAmount} />
@@ -198,7 +192,7 @@ const Home: React.FC = () => {
           {currentStep === "error" && (
             <CenteredRow>
               <Col span={24}>
-                <Result status="error" title="Error" subTitle="An error occurred while processing your payment." />
+                <Result status="error" title="Transaction Error" subTitle="A problem was encountered while processing your payment. Please try again later." />
               </Col>
             </CenteredRow>
           )}
