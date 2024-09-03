@@ -4,10 +4,11 @@ import logger from '@/lib/logger';
 
 export async function POST(request: NextRequest) {
     try {
-        const { address, amount } = await request.json();
+        const { address, amount, qrGeneratedTime } = await request.json();
 
         // Validate input parameters
-        if (!address || typeof address !== 'string' || !amount || isNaN(Number(amount))) {
+        if (!address || typeof address !== 'string' || !amount || isNaN(Number(amount)) || !qrGeneratedTime || isNaN(Number(qrGeneratedTime))) {
+            logger.error('Invalid input parameters:', { address, amount, qrGeneratedTime });
             return NextResponse.json({ status: 'error', success: false, data: null }, { status: 400 });
         }
 
@@ -17,21 +18,20 @@ export async function POST(request: NextRequest) {
         // Fetch transactions for the given address
         const { data: transactions } = await axios.get(`${process.env.EXPLORER_API_URL}/address/${address}/txs`);
 
-        if (transactions.length > 0) {
-            const lastTransaction = transactions[0]; // Most recent transaction
-            const transactionAmountMatches = lastTransaction.vout.some((output: Vout) => output.scriptpubkey_address === address && output.value === amountInSatoshis);
+        // Find the transaction with the exact amount and address, and ensure block_time is after qrGeneratedTime
+        const matchingTransaction = transactions.find((tx: Transaction) => {
+            const isAmountAndAddressMatch = tx.vout.some((output: Vout) => output.scriptpubkey_address === address && output.value === amountInSatoshis);
+            const isAfterQrTime = tx.status.block_time * 1000 > qrGeneratedTime; // Convert block_time to milliseconds
+            return isAmountAndAddressMatch && isAfterQrTime;
+        });
 
-            if (!transactionAmountMatches) {
-                return NextResponse.json({ status: 'awaiting', success: true, data: null }, { status: 200 });
-            }
-
-            // Check confirmation status
-            const transactionId = lastTransaction.txid; // Get the transaction ID
+        if (matchingTransaction) {
+            const transactionId = matchingTransaction.txid;
             const tBTCAmount = (amountInSatoshis / 1e8).toFixed(8); // Convert satoshis to tBTC
 
             return NextResponse.json(
                 {
-                    status: lastTransaction.status.confirmed ? 'confirmed' : 'unconfirmed',
+                    status: matchingTransaction.status.confirmed ? 'confirmed' : 'unconfirmed',
                     success: true,
                     data: { address, amount: tBTCAmount, transactionId },
                 },
@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Default : No relevant transactions found
+        // No matching transactions found
         return NextResponse.json({ status: 'awaiting', success: true, data: null }, { status: 200 });
     } catch (error) {
         logger.error('Error checking payment status:', error);
@@ -47,9 +47,48 @@ export async function POST(request: NextRequest) {
     }
 }
 
-// TypeScript Interfaces
-interface Vout {
+interface Prevout {
     scriptpubkey: string;
+    scriptpubkey_asm: string;
+    scriptpubkey_type: string;
     scriptpubkey_address: string;
     value: number;
+}
+
+interface Vin {
+    txid: string;
+    vout: number;
+    prevout: Prevout;
+    scriptsig: string;
+    scriptsig_asm: string;
+    witness: string[];
+    is_coinbase: boolean;
+    sequence: number;
+}
+
+interface Vout {
+    scriptpubkey: string;
+    scriptpubkey_asm: string;
+    scriptpubkey_type: string;
+    scriptpubkey_address: string;
+    value: number;
+}
+
+interface Status {
+    confirmed: boolean;
+    block_height: number;
+    block_hash: string;
+    block_time: number;
+}
+
+interface Transaction {
+    txid: string;
+    version: number;
+    locktime: number;
+    vin: Vin[];
+    vout: Vout[];
+    size: number;
+    weight: number;
+    fee: number;
+    status: Status;
 }
