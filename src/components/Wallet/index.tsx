@@ -78,7 +78,7 @@ const Wallet: React.FC = () => {
           </Button>
         </Badge>
       </Tooltip>
-      <Drawer title={`${transactions.length} Transaction${transactions.length !== 1 ? 's' : ''}`} onClose={() => setTransactionsVisibility(false)} open={isTransactionsVisible}>
+      <Drawer title={`${transactions.length} Transaction${transactions.length !== 1 ? 's' : ''}`} onClose={() => setTransactionsVisibility(false)} open={isTransactionsVisible} destroyOnClose>
         <List
           dataSource={transactions}
           renderItem={(item) => (
