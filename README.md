@@ -71,6 +71,26 @@ Follow these steps to set up the project:
 5. Open the application:
    Access the app at `http://localhost:3000` in your browser.
 
+## Testing
+
+To ensure the application functions correctly, follow these steps to run the tests:
+
+1. Make sure you have all dependencies installed:
+
+   ```bash
+   npm install
+   ```
+
+2. Run the test suite:
+
+   ```bash
+   npm test
+   npm run cypress:run
+   ```
+
+This will execute all the unit, integration and e2e tests for the application. The test results will be displayed in your terminal, showing which tests passed or failed.
+
+
 ## How to Use
 
 - **Generate a New Wallet**: The app automatically generates a new HD wallet upon startup.
