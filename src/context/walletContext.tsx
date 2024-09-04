@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
+import { notification } from 'antd';
 
 // Define the Wallet context type
 interface WalletContextType {
@@ -28,7 +29,12 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
                     throw new Error(`Failed to generate wallet address: ${data.message || 'Unknown error'}`);
                 }
             } catch (error) {
-                console.error('Error fetching wallet address:', error);
+                notification.error({
+                    message: 'Error',
+                    description: 'Failed to fetch wallet address. Please try again later.',
+                    duration: 5,
+                    placement: 'top',
+                });
             }
         };
 
