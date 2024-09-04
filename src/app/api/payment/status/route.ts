@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
     }
 
     // No matching transactions found
-    return NextResponse.json({ status: 'awaiting', success: true, data: null }, { status: 200 });
+    return NextResponse.json({ status: 'showQRCode', success: true, data: null }, { status: 200 });
   } catch (error) {
     logger.error('Error checking payment status:', error);
     return NextResponse.json({ success: false, data: null }, { status: 500 });
