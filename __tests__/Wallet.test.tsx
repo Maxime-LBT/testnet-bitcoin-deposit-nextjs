@@ -169,7 +169,7 @@ describe('Wallet Component', () => {
     });
 
     // Verify fetch is called with correct parameters
-    await waitFor(() => expect(global.fetch).toHaveBeenCalledWith('/api/wallet/test-address'));
+    await waitFor(() => expect(global.fetch).toHaveBeenCalledWith('/api/wallet/test-address', { cache: 'no-store' }));
     expect(global.fetch).toHaveBeenCalledTimes(1);
 
     jest.useRealTimers();
