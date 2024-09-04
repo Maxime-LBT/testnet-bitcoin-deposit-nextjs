@@ -18,7 +18,7 @@ const ErrorStep: FC<{ onBack: () => void }> = ({ onBack }) => (
         title="Transaction Error"
         subTitle="An issue was encountered while processing your payment. Please try again later."
         extra={[
-          <Button key="deposit" onClick={onBack}>
+          <Button key="deposit" type="primary" onClick={onBack}>
             Try Again
           </Button>,
         ]}
