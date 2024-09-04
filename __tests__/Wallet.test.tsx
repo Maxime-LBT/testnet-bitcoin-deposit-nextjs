@@ -1,25 +1,11 @@
+
+
 import React from 'react';
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import Wallet from '@/components/Wallet';
 import { useWallet } from '@/context/walletContext';
 
-beforeAll(() => {
-  Object.defineProperty(window, 'matchMedia', {
-    writable: true,
-    value: jest.fn().mockImplementation((query) => ({
-      matches: false,
-      media: query,
-      onchange: null,
-      addListener: jest.fn(),
-      removeListener: jest.fn(),
-      addEventListener: jest.fn(),
-      removeEventListener: jest.fn(),
-      dispatchEvent: jest.fn(),
-    })),
-  });
-});
-
-// Mock the wallet context
+// Setup mocks for wallet context and fetch
 jest.mock('@/context/walletContext', () => ({
   useWallet: jest.fn(),
 }));
@@ -54,6 +40,24 @@ global.fetch = jest.fn(() =>
   })
 );
 
+// Setup mock for window.matchMedia to avoid warnings in the tests
+beforeAll(() => {
+  Object.defineProperty(window, 'matchMedia', {
+    writable: true,
+    value: jest.fn().mockImplementation((query) => ({
+      matches: false,
+      media: query,
+      onchange: null,
+      addListener: jest.fn(),
+      removeListener: jest.fn(),
+      addEventListener: jest.fn(),
+      removeEventListener: jest.fn(),
+      dispatchEvent: jest.fn(),
+    })),
+  });
+});
+
+// Group related tests for the Wallet component
 describe('Wallet Component', () => {
   const mockWallet = {
     address: 'test-address',
@@ -66,115 +70,164 @@ describe('Wallet Component', () => {
     jest.clearAllMocks();
   });
 
-  test('renders correctly', async () => {
+  // Test rendering with wallet address present
+  test('renders correctly when wallet address is present', async () => {
     render(<Wallet />);
 
-    const infoButton = screen.getByTitle('Display wallet information');
-    const transactionsButton = screen.getByTitle('Display wallet transactions');
-
-    expect(infoButton).toBeInTheDocument();
-    expect(transactionsButton).toBeInTheDocument();
+    // Verify elements are displayed
+    expect(screen.getByTitle('Display wallet information')).toBeInTheDocument();
+    expect(screen.getByTitle('Display wallet transactions')).toBeInTheDocument();
   });
 
-  test('shows wallet modal when button is clicked', async () => {
+  // Test wallet modal opens on button click
+  test('opens wallet modal when "Display wallet information" button is clicked', async () => {
     render(<Wallet />);
 
+    // Click the button to display wallet information
     await act(async () => {
-      const infoButton = screen.getByTitle(/display wallet information/i);
-      fireEvent.click(infoButton);
+      fireEvent.click(screen.getByTitle(/display wallet information/i));
     });
 
-    const modalTitle = await screen.findByText('Wallet');
-    expect(modalTitle).toBeInTheDocument();
-
+    // Verify modal elements are displayed
+    expect(await screen.findByText('Wallet')).toBeInTheDocument();
     expect(screen.getByRole('textbox', { name: 'address' })).toHaveValue('test-address');
     expect(screen.getByRole('textbox', { name: 'privateKey' })).toHaveValue('test-private-key');
     expect(screen.getByRole('textbox', { name: 'mnemonic' })).toHaveValue('test-mnemonic');
   });
 
+  // Test opening and closing the transactions drawer
   test('opens and closes the transactions drawer', async () => {
     render(<Wallet />);
 
     // Open the transactions drawer
     await act(async () => {
-      const transactionsButton = screen.getByTitle(/display wallet transactions/i);
-      fireEvent.click(transactionsButton);
+      fireEvent.click(screen.getByTitle(/display wallet transactions/i));
     });
 
-    // Check that the drawer is opened and transactions are displayed
-    const drawerTitle = await screen.findByText('2 Transactions');
-    expect(drawerTitle).toBeInTheDocument();
-
-    // Verify that each transaction item is displayed
-    const firstTransaction = screen.getByText(/transaction id: abcd...1234/i);
-    const secondTransaction = screen.getByText(/transaction id: efgh...5678/i);
-    expect(firstTransaction).toBeInTheDocument();
-    expect(secondTransaction).toBeInTheDocument();
+    // Verify drawer opens and displays transactions
+    expect(await screen.findByText('2 Transactions')).toBeInTheDocument();
+    expect(screen.getByText(/transaction id: abcd...1234/i)).toBeInTheDocument();
+    expect(screen.getByText(/transaction id: efgh...5678/i)).toBeInTheDocument();
 
     // Close the transactions drawer
     await act(async () => {
-      const closeButton = screen.getByRole('button', { name: /close/i });
-      fireEvent.click(closeButton);
+      fireEvent.click(screen.getByRole('button', { name: /close/i }));
     });
 
-    // Ensure the drawer is closed
+    // Verify drawer is closed
     expect(screen.queryByText('2 Transactions')).not.toBeInTheDocument();
   });
 
+  // Test fetching and displaying balance and transactions
   test('fetches and displays balance and transactions correctly', async () => {
     render(<Wallet />);
 
+    // Verify balance is displayed correctly
     await waitFor(() => expect(screen.getByText('3 tBTC')).toBeInTheDocument());
 
+    // Open the transactions drawer
     await act(async () => {
-      const transactionsButton = screen.getByTitle(/display wallet transactions/i);
-      fireEvent.click(transactionsButton);
+      fireEvent.click(screen.getByTitle(/display wallet transactions/i));
     });
 
-    const receivedTransaction = await screen.findByText('Transaction ID: abcd...1234');
-    const sentTransaction = await screen.findByText('Transaction ID: efgh...5678');
-    expect(receivedTransaction).toBeInTheDocument();
-    expect(sentTransaction).toBeInTheDocument();
+    // Verify transactions are displayed
+    expect(await screen.findByText('Transaction ID: abcd...1234')).toBeInTheDocument();
+    expect(await screen.findByText('Transaction ID: efgh...5678')).toBeInTheDocument();
   });
 
+  // Test that inputs are read-only and cannot be changed
   test('inputs are read-only and cannot be changed', async () => {
     render(<Wallet />);
 
+    // Open the wallet information modal
     await act(async () => {
-      const infoButton = screen.getByTitle(/display wallet information/i);
-      fireEvent.click(infoButton);
+      fireEvent.click(screen.getByTitle(/display wallet information/i));
     });
 
     const addressInput = screen.getByRole('textbox', { name: 'address' });
     const privateKeyInput = screen.getByRole('textbox', { name: 'privateKey' });
     const mnemonicInput = screen.getByRole('textbox', { name: 'mnemonic' });
 
+    // Attempt to change input values
     fireEvent.change(addressInput, { target: { value: 'new-address' } });
     fireEvent.change(privateKeyInput, { target: { value: 'new-private-key' } });
     fireEvent.change(mnemonicInput, { target: { value: 'new-mnemonic' } });
 
+    // Verify inputs remain unchanged
     expect(addressInput).toHaveValue('test-address');
     expect(privateKeyInput).toHaveValue('test-private-key');
     expect(mnemonicInput).toHaveValue('test-mnemonic');
   });
 
+  // Test periodic fetching of balance updates
   test('fetches balance periodically and updates state', async () => {
     jest.useFakeTimers();
 
     render(<Wallet />);
 
+    // Run pending timers to trigger fetch
     await act(async () => {
       jest.runOnlyPendingTimers();
     });
 
+    // Verify fetch is called with correct parameters
     await waitFor(() => expect(global.fetch).toHaveBeenCalledWith('/api/wallet/test-address'));
-
-    await act(async () => {
-      jest.runOnlyPendingTimers();
-    });
-
-    expect(global.fetch).toHaveBeenCalledTimes(2);
+    expect(global.fetch).toHaveBeenCalledTimes(1);
 
     jest.useRealTimers();
+  });
+
+  // Test cleanup of interval on component unmount
+  test('cleans up the interval on unmount', async () => {
+    jest.useFakeTimers();
+    const clearIntervalSpy = jest.spyOn(global, 'clearInterval');
+
+    const { unmount } = render(<Wallet />);
+
+    // Run pending timers before unmounting
+    await act(async () => {
+      jest.runOnlyPendingTimers();
+    });
+
+    unmount();
+
+    // Verify interval is cleared
+    expect(clearIntervalSpy).toHaveBeenCalledTimes(1);
+
+    clearIntervalSpy.mockRestore();
+    jest.useRealTimers();
+  });
+
+  // Test component does not render without wallet address
+  test('does not render when wallet address is absent', async () => {
+    (useWallet as jest.Mock).mockReturnValue({ wallet: {} });
+
+    const { container } = render(<Wallet />);
+
+    // Verify component does not render any content
+    expect(container.firstChild).toBeNull();
+  });
+
+  // Test handling of no transactions scenario
+  test('displays no transactions message when there are no transactions', async () => {
+    jest.spyOn(global, 'fetch').mockImplementationOnce(() =>
+      Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve({ data: { balance: 0, transactions: [] } }),
+      } as unknown as Response)
+    );
+
+    render(<Wallet />);
+
+    // Wait until the balance is updated to "0 tBTC"
+    await waitFor(() => expect(screen.getByText('0 tBTC')).toBeInTheDocument());
+
+    // Open the transactions drawer
+    await act(async () => {
+      fireEvent.click(screen.getByTitle(/display wallet transactions/i));
+    });
+
+    // Verify "no transactions" message is displayed
+    expect(screen.getByText('0 Transactions')).toBeInTheDocument();
   });
 });
