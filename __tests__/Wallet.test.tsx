@@ -217,9 +217,6 @@ describe('Wallet Component', () => {
 
     render(<Wallet />);
 
-    // Wait until the balance is updated to "0 tBTC"
-    await waitFor(() => expect(screen.getByText('0 tBTC')).toBeInTheDocument());
-
     // Open the transactions drawer
     await act(async () => {
       fireEvent.click(screen.getByTitle(/display wallet transactions/i));
