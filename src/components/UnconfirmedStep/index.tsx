@@ -3,6 +3,7 @@ import { Button, Col, Result, Row } from 'antd';
 import { LoadingOutlined } from '@ant-design/icons';
 import Link from 'next/link';
 import styled from 'styled-components';
+import { motion } from 'framer-motion';
 
 const CenteredRow = styled(Row)`
   align-items: center;
@@ -18,27 +19,29 @@ interface UnconfirmedStepProps {
 }
 
 const UnconfirmedStep: FC<UnconfirmedStepProps> = ({ transaction, onBack }) => (
-  <CenteredRow>
-    <Col span={24}>
-      <Result
-        icon={<LoadingOutlined data-testid="loading-outlined" />}
-        title="Payment Detected"
-        subTitle="Waiting for confirmation. Please wait..."
-        extra={[
-          transaction ? (
-            <Button type="primary" key="console">
-              <Link href={`https://blockstream.info/tx/${transaction}`} target="_blank">
-                View Transaction
-              </Link>
-            </Button>
-          ) : null,
-          <Button key="deposit" onClick={onBack}>
-            Deposit Again
-          </Button>,
-        ]}
-      />
-    </Col>
-  </CenteredRow>
+  <motion.div key="confirmedStep" initial={{ x: -100, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.1 }}>
+    <CenteredRow>
+      <Col span={24}>
+        <Result
+          icon={<LoadingOutlined data-testid="loading-outlined" />}
+          title="Payment Detected"
+          subTitle="Waiting for confirmation. Please wait..."
+          extra={[
+            transaction ? (
+              <Button type="primary" key="console">
+                <Link href={`https://blockstream.info/tx/${transaction}`} target="_blank">
+                  View Transaction
+                </Link>
+              </Button>
+            ) : null,
+            <Button key="deposit" onClick={onBack}>
+              Deposit Again
+            </Button>,
+          ]}
+        />
+      </Col>
+    </CenteredRow>
+  </motion.div>
 );
 
 export default UnconfirmedStep;
