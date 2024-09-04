@@ -1,5 +1,5 @@
 {
-  "name": "autoraz-frontend",
+  "name": "testnet-bitcoin-deposit-nextjs",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -67,10 +67,6 @@
     "jest-environment-jsdom": "^29.7.0",
     "lint-staged": "^15.2.10",
     "local-cypress": "^1.2.6",
-    "node-mocks-http": "^1.15.1",
-    "postcss": "^8",
-    "prettier": "3.0.3",
-    "supertest": "^7.0.0",
     "ts-jest": "^29.2.5",
     "ts-node": "^10.9.2",
     "typescript": "^5.5.4",
