@@ -1,5 +1,3 @@
-
-
 import React from 'react';
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import Wallet from '@/components/Wallet';
@@ -37,7 +35,7 @@ global.fetch = jest.fn(() =>
           ],
         },
       }),
-  })
+  }),
 );
 
 // Setup mock for window.matchMedia to avoid warnings in the tests
@@ -214,7 +212,7 @@ describe('Wallet Component', () => {
       Promise.resolve({
         ok: true,
         json: () => Promise.resolve({ data: { balance: 0, transactions: [] } }),
-      } as unknown as Response)
+      } as unknown as Response),
     );
 
     render(<Wallet />);
