@@ -58,7 +58,7 @@ const QRCodeStep: FC<QRCodeStepProps> = ({ paymentRequest, btcAmount, onCancel }
         <Row gutter={[16, 8]}>
           <LeftAlignedCol span={24}>
             <Space align="center">
-              <Tooltip title="The payment will be autodetected">
+              <Tooltip title="The payment will be automatically detected.">
                 <ExclamationIcon />
               </Tooltip>
               <InfoText>Scan and send {btcAmount} BTC</InfoText>
