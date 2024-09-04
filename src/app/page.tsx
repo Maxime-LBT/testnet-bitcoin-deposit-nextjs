@@ -100,6 +100,8 @@ const Home: FC = () => {
 
       // Add transaction link or stop polling
       switch (data.status) {
+        case 'showQRCode':
+          break;
         case 'unconfirmed':
           setTransaction(data.data?.transactionId || null);
           break;
