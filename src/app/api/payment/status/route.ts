@@ -18,24 +18,23 @@ export async function POST(request: NextRequest) {
     // Fetch transactions for the given address
     const { data: transactions } = await axios.get(`${process.env.EXPLORER_API_URL}/api/address/${address}/txs`);
 
-    // Find the transaction with the exact amount
-    const matchingTransaction = transactions.find((tx: Transaction) => {
-      const isAmountAndAddressMatch = tx.vout.some((output: Vout) => output.scriptpubkey_address === address && output.value === amountInSatoshis);
-      return isAmountAndAddressMatch;
-    });
+    if (transactions.length) {
+      // Check last transaction is the exact amount
+      const lastTransaction: Transaction = transactions[0];
+      const isAmountAndAddressMatch = lastTransaction.vout.some((output: Vout) => output.scriptpubkey_address === address && output.value === amountInSatoshis);
+      if (isAmountAndAddressMatch) {
+        const transactionId = lastTransaction.txid;
+        const tBTCAmount = (amountInSatoshis / 1e8).toFixed(8); // Convert satoshis to tBTC
 
-    if (matchingTransaction) {
-      const transactionId = matchingTransaction.txid;
-      const tBTCAmount = (amountInSatoshis / 1e8).toFixed(8); // Convert satoshis to tBTC
-
-      return NextResponse.json(
-        {
-          status: matchingTransaction.status.confirmed ? 'confirmed' : 'unconfirmed',
-          success: true,
-          data: { address, amount: tBTCAmount, transactionId },
-        },
-        { status: 200 },
-      );
+        return NextResponse.json(
+          {
+            status: lastTransaction.status.confirmed ? 'confirmed' : 'unconfirmed',
+            success: true,
+            data: { address, amount: tBTCAmount, transactionId },
+          },
+          { status: 200 },
+        );
+      }
     }
 
     // No matching transactions found
