@@ -60,7 +60,7 @@ Follow these steps to set up the project:
    NODE_ENV=development || production
 
    # Bitcoin Testnet API URL
-   EXPLORER_API_URL=https://blockstream.info/testnet/api
+   EXPLORER_API_URL=https://blockstream.info/testnet
 
    # Polling interval in milliseconds
    POLLING_INTERVAL=5000
