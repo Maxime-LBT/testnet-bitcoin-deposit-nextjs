@@ -1,23 +1,23 @@
-# TBDA - Testnet Bitcoin Deposit App
+# TBDA - Testnet Bitcoin Deposit Application
 
-This is a simple Next.js application that allows users to generate testnet Bitcoin payment requests, display a QR code for the payment, and check the payment status in real-time.
+This repository contains a Next.js application designed to facilitate the generation of testnet Bitcoin payment requests, display QR codes for payments, and monitor payment status in real-time.
 
-## Demo
+## Live Demo
 
-You can try out the live demo of the application at: https://bitcoin-request-nise955cq-autoraz.vercel.app/
+Experience the live demo of the application at: https://bitcoin-request.vercel.app/
 
 ## Key Features
 
-- **Generate HD Wallet**: Automatically creates a new HD (Hierarchical Deterministic) wallet every time the server is restarted or the page is reloaded.
+- **HD Wallet Generation**: Automatically generates a new Hierarchical Deterministic (HD) wallet each time the server is restarted or the page is reloaded.
 - **Payment Form**: Allows users to specify the desired amount of Bitcoin (BTC) for the payment.
 - **QR Code Display**: Generates and displays a QR code for the payment request, enabling users to easily scan and make payments.
 - **Payment Status Monitoring**: Continuously polls for the payment status to detect when the payment has been received, providing real-time feedback to the user.
 - **Error Handling**: Robust handling of various error cases, such as invalid input or network issues, with clear feedback to enhance user experience.
-- **Responsive Design**: Ensures that the app is user-friendly across different devices and screen sizes.
+- **Responsive Design**: Ensures that the application is user-friendly across different devices and screen sizes.
 
-## Tech Stack
+## Technology Stack
 
-This application is built with the following technologies:
+This application is built using the following technologies:
 
 - **Next.js**: For server-side rendering, routing, and API management.
 - **React**: To create a dynamic and responsive user interface.
@@ -30,7 +30,7 @@ This application is built with the following technologies:
 
 ### Prerequisites
 
-Before running the application, ensure you have:
+Before running the application, ensure you have the following:
 
 - **Node.js and npm**: The latest versions installed.
 - **A Testnet Bitcoin Wallet**: Set up for testing purposes.
@@ -79,20 +79,20 @@ Follow these steps to set up the project:
 
 To ensure the application functions correctly, follow these steps to run the tests:
 
-1. Make sure you have all dependencies installed:
+1. Ensure all dependencies are installed:
 
    ```bash
    npm install
    ```
 
-2. Run the test suite:
+2. Execute the test suite:
 
    ```bash
    npm test
    npm run cypress:run
    ```
 
-This will execute all the unit, integration and e2e tests for the application. The test results will be displayed in your terminal, showing which tests passed or failed.
+This will execute all unit, integration, and end-to-end tests for the application. The test results will be displayed in your terminal, indicating which tests passed or failed.
 
 ## Deployment
 
@@ -104,25 +104,25 @@ To deploy the application, follow these steps:
 
 3. Connect your GitHub account to Vercel.
 
-4. Fill the Vercel token on Github Secrets
+4. Add the Vercel token to GitHub Secrets.
 
 The GitHub Action will automatically deploy your application to Vercel whenever changes are pushed to the `main` branch.
 
-## How to Use
+## Usage Instructions
 
 - **Enter Payment Amount**: Use the provided form to specify the amount of BTC you wish to pay.
-- **Get the QR Code**: A QR code is generated for the payment request.
-- **Get back your testnet BTC**: The private key / mnemonic is generated on the server and will be displayed.
+- **Generate QR Code**: A QR code is generated for the payment request.
+- **Retrieve Testnet BTC**: The private key/mnemonic is generated on the server and will be displayed.
 
-## Improvements
+## Future Improvements
 
-- Add env setting for the number of block confirmations to wait for before validating payment (current is 1)
-- Payment will be confirmed if the last transaction is the same amout : create a new wallet for each payment request or use memo/label
-- Add frontend logging with Sentry
+- Add environment setting for the number of block confirmations to wait for before validating payment (currently set to 1).
+- Ensure payment confirmation by creating a new wallet for each payment request or using memo/label to avoid conflicts with the same amount transactions.
+- Integrate frontend logging with Sentry for enhanced monitoring and debugging.
 
 ## Contributing
 
-We welcome contributions! If you'd like to contribute, please fork the repository and submit a pull request.
+We welcome contributions! If you would like to contribute, please fork the repository and submit a pull request.
 
 ## License
 
