@@ -46,7 +46,7 @@ const Wallet: React.FC = () => {
         setTransactions(data.data.transactions);
     };
 
-    return (
+    return wallet.address ? (
         <Space align="baseline">
             <BalanceText>{balance !== -1 ? `${balance} tBTC` : <Skeleton.Input active={true} size={'small'} />}</BalanceText>
             <Tooltip title="Display wallet information">
@@ -109,7 +109,7 @@ const Wallet: React.FC = () => {
                 />
             </Drawer>
         </Space>
-    );
+    ) : null;
 };
 
 export default Wallet;
