@@ -108,7 +108,6 @@ To deploy the application, follow these steps:
 
 The GitHub Action will automatically deploy your application to Vercel whenever changes are pushed to the `main` branch.
 
-
 ## How to Use
 
 - **Enter Payment Amount**: Use the provided form to specify the amount of BTC you wish to pay.
@@ -118,7 +117,8 @@ The GitHub Action will automatically deploy your application to Vercel whenever 
 ## Improvements
 
 - Add env setting for the number of block confirmations to wait for before validating payment (current is 1)
-- Payment will be confirmed if the last transaction is the same amout : create a new wallet for each payment request or use memo/label 
+- Payment will be confirmed if the last transaction is the same amout : create a new wallet for each payment request or use memo/label
+- Add frontend logging with Sentry
 
 ## Contributing
 
