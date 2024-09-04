@@ -12,32 +12,32 @@ const network: Network = networks.testnet;
 
 // Generate a new HD wallet with a secure mnemonic
 export async function GET() {
-    try {
-        const mnemonic = generateMnemonic(256); // Generate a secure 24-word mnemonic
-        const seed = mnemonicToSeedSync(mnemonic);
-        const root = bip32.fromSeed(seed, network);
+  try {
+    const mnemonic = generateMnemonic(256); // Generate a secure 24-word mnemonic
+    const seed = mnemonicToSeedSync(mnemonic);
+    const root = bip32.fromSeed(seed, network);
 
-        // Derive a path compatible with BIP44 for Bitcoin Testnet
-        const node = root.derivePath("m/44'/1'/0'/0/0");
-        const { address } = payments.p2pkh({ pubkey: node.publicKey, network });
+    // Derive a path compatible with BIP44 for Bitcoin Testnet
+    const node = root.derivePath("m/44'/1'/0'/0/0");
+    const { address } = payments.p2pkh({ pubkey: node.publicKey, network });
 
-        // Convert the private key to WIF format
-        const keyPair = ECPair.fromPrivateKey(node.privateKey as Buffer, { network });
-        const wif = keyPair.toWIF();
+    // Convert the private key to WIF format
+    const keyPair = ECPair.fromPrivateKey(node.privateKey as Buffer, { network });
+    const wif = keyPair.toWIF();
 
-        // Return a JSON response with wallet details
-        return NextResponse.json(
-            {
-                data: {
-                    address,
-                    privateKey: wif,
-                    mnemonic,
-                },
-            },
-            { status: 200 },
-        );
-    } catch (error) {
-        logger.error('Error generating wallet:', error);
-        return NextResponse.json({ message: 'Internal Server Error', data: null }, { status: 500 });
-    }
+    // Return a JSON response with wallet details
+    return NextResponse.json(
+      {
+        data: {
+          address,
+          privateKey: wif,
+          mnemonic,
+        },
+      },
+      { status: 200 },
+    );
+  } catch (error) {
+    logger.error('Error generating wallet:', error);
+    return NextResponse.json({ message: 'Internal Server Error', data: null }, { status: 500 });
+  }
 }
