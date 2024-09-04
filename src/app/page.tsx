@@ -1,34 +1,25 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, FC } from 'react';
 import styled from 'styled-components';
-import RequestForm from '@/components/RequestForm';
-import QRCodeDisplay from '@/components/QRCodeDisplay';
-import { Button, Col, notification, Result, Row } from 'antd';
+import { notification } from 'antd';
 import { LoadingOutlined } from '@ant-design/icons';
-import { motion, AnimatePresence } from 'framer-motion'; // Import framer-motion for animations
+import { AnimatePresence } from 'framer-motion';
 import { useWallet } from '@/context/walletContext';
-import Link from 'next/link';
+import RequestForm from '@/components/RequestStep';
+import QRCodeStep from '@/components/QRCodeStep';
+import UnconfirmedStep from '@/components/UnconfirmedStep';
+import ConfirmedStep from '@/components/ConfirmedStep';
+import ErrorStep from '@/components/ErrorStep';
 
+// Styled components
 const Container = styled.div`
   display: flex;
-  flex-direction: column; /* Change to column for vertical alignment */
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   text-align: center;
   margin: 0 auto;
-`;
-
-const QRCodeWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-top: 0px;
-  width: 100%; // Ensure QR code wrapper is responsive
-
-  @media (max-width: 768px) {
-    margin-top: 0px;
-  }
 `;
 
 const LoadingIcon = styled(LoadingOutlined)`
@@ -37,28 +28,28 @@ const LoadingIcon = styled(LoadingOutlined)`
   margin-top: 50px;
 `;
 
-const MotionDiv = styled(motion.div)`
-  position: relative;
-  z-index: 1;
-`;
+// Types for components
+type StepType = 'enterAmount' | 'showQRCode' | 'unconfirmed' | 'confirmed' | 'error';
 
-const CenteredRow = styled(Row)`
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  margin: auto;
-  text-align: center;
-`;
+interface PaymentStatusResponse {
+  success: boolean;
+  status: StepType;
+  data?: {
+    transactionId: string;
+  };
+}
 
-const Home: React.FC = () => {
+// Main component
+const Home: FC = () => {
   const { wallet } = useWallet();
-  const [currentStep, setCurrentStep] = useState<'enterAmount' | 'showQRCode' | 'unconfirmed' | 'confirmed' | 'error'>('enterAmount');
+  const [currentStep, setCurrentStep] = useState<StepType>('enterAmount');
   const [paymentRequest, setPaymentRequest] = useState<string>('');
   const [btcAmount, setBtcAmount] = useState<number>(0);
   const [transaction, setTransaction] = useState<string | null>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
+    // Cleanup interval on component unmount
     return () => {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
@@ -68,26 +59,18 @@ const Home: React.FC = () => {
 
   const handleFormSubmit = (amount: number) => {
     if (!wallet.address) {
-      notification.error({
-        message: 'Wallet Not Available',
-        description: 'Your wallet is currently unavailable. Please try again later.',
-        placement: 'top',
-      });
+      notifyError('Wallet Not Available', 'Your wallet is currently unavailable. Please try again later.');
       return;
     }
 
     if (!amount || isNaN(amount) || amount <= 0) {
-      notification.error({
-        message: 'Invalid Amount',
-        description: 'Please enter a valid BTC amount.',
-        placement: 'top',
-      });
+      notifyError('Invalid Amount', 'Please enter a valid BTC amount.');
       return;
     }
 
-    setBtcAmount(amount); // Store the BTC amount
+    setBtcAmount(amount);
     setPaymentRequest(`bitcoin:${wallet.address}?amount=${amount}`);
-    setCurrentStep('showQRCode'); // Move to the next step to show the QR code
+    setCurrentStep('showQRCode');
     pollPaymentStatus(wallet.address, amount);
   };
 
@@ -100,9 +83,7 @@ const Home: React.FC = () => {
       try {
         const response = await fetch(`/api/payment/status`, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ address, amount }),
         });
 
@@ -110,33 +91,8 @@ const Home: React.FC = () => {
           throw new Error(`Failed to check payment status: ${response.statusText}`);
         }
 
-        const data = await response.json();
-
-        if (data && data.success) {
-          // Switch steps based on payment status
-          switch (data.status) {
-            case 'awaiting':
-              setCurrentStep('showQRCode');
-              break;
-            case 'unconfirmed':
-              setTransaction(data.data.transactionId);
-              setCurrentStep('unconfirmed');
-              break;
-            case 'confirmed':
-              setTransaction(data.data.transactionId);
-              setCurrentStep('confirmed');
-              clearInterval(intervalRef.current!);
-              break;
-            case 'error':
-              setCurrentStep('error');
-              clearInterval(intervalRef.current!);
-              break;
-            default:
-              setCurrentStep('error');
-              clearInterval(intervalRef.current!);
-              break;
-          }
-        }
+        const data: PaymentStatusResponse = await response.json();
+        handlePaymentStatus(data);
       } catch (error) {
         setCurrentStep('error');
         clearInterval(intervalRef.current!);
@@ -144,89 +100,54 @@ const Home: React.FC = () => {
     }, Number(process.env.NEXT_PUBLIC_POLLING_INTERVAL)); // Use environment variable for polling interval
   };
 
-  // Function to handle going back to the previous step
+  const handlePaymentStatus = (data: PaymentStatusResponse) => {
+    if (data && data.success) {
+      setCurrentStep(data.status);
+
+      // Add transaction link or stop polling
+      switch (data.status) {
+        case 'unconfirmed':
+          setTransaction(data.data?.transactionId || null);
+          break;
+        case 'confirmed':
+          setTransaction(data.data?.transactionId || null);
+          clearInterval(intervalRef.current!);
+          break;
+        default:
+          clearInterval(intervalRef.current!);
+          break;
+      }
+    } else {
+      setCurrentStep('error');
+      clearInterval(intervalRef.current!);
+    }
+  };
+
+  const notifyError = (message: string, description: string) => {
+    notification.error({ message, description, placement: 'top' });
+  };
+
   const handleBack = () => {
     setCurrentStep('enterAmount');
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
     }
   };
+
   const renderContent = () => {
-    if (!wallet.address) {
-      return <LoadingIcon />;
-    } else if (currentStep === 'enterAmount') {
-      return <RequestForm onSubmit={handleFormSubmit} />;
-    } else {
-      return (
-        <MotionDiv key={currentStep} initial={{ x: -100, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.1, exit: { duration: 0.0 } }}>
-          {currentStep === 'showQRCode' && (
-            <QRCodeWrapper>
-              <QRCodeDisplay value={paymentRequest} amount={btcAmount} />
-              <Button key="cancel-transaction" id="cancel-transaction" type="primary" style={{ backgroundColor: '#f5222d', borderColor: '#f5222d', marginTop: '10px' }} onClick={handleBack}>
-                Cancel
-              </Button>
-            </QRCodeWrapper>
-          )}
-          {currentStep === 'unconfirmed' && (
-            <CenteredRow>
-              <Col span={24}>
-                <Result
-                  icon={<LoadingOutlined />}
-                  title="Payment Detected"
-                  subTitle="Waiting for confirmation. Please wait..."
-                  extra={[
-                    <Button type="primary" key="console">
-                      <Link href={`https://blockstream.info/tx/${transaction}`} target="_blank">
-                        View Transaction
-                      </Link>
-                    </Button>,
-                    <Button key="deposit" onClick={handleBack}>
-                      Deposit Again
-                    </Button>,
-                  ]}
-                />
-              </Col>
-            </CenteredRow>
-          )}
-          {currentStep === 'confirmed' && (
-            <CenteredRow>
-              <Col span={24}>
-                <Result
-                  status="success"
-                  title="Payment Confirmed!"
-                  subTitle={`Your payment of ${btcAmount} tBTC has been successfully confirmed.`}
-                  extra={[
-                    <Button type="primary" key="console">
-                      <Link href={`https://blockstream.info/tx/${transaction}`} target="_blank">
-                        View Transaction
-                      </Link>
-                    </Button>,
-                    <Button key="deposit" onClick={handleBack}>
-                      Deposit Again
-                    </Button>,
-                  ]}
-                />
-              </Col>
-            </CenteredRow>
-          )}
-          {currentStep === 'error' && (
-            <CenteredRow>
-              <Col span={24}>
-                <Result
-                  status="error"
-                  title="Transaction Error"
-                  subTitle="An issue was encountered while processing your payment. Please try again later."
-                  extra={[
-                    <Button key="deposit" onClick={handleBack}>
-                      Try Again
-                    </Button>,
-                  ]}
-                />
-              </Col>
-            </CenteredRow>
-          )}
-        </MotionDiv>
-      );
+    switch (wallet.address && currentStep) {
+      case 'enterAmount':
+        return <RequestForm onSubmit={handleFormSubmit} />;
+      case 'showQRCode':
+        return <QRCodeStep paymentRequest={paymentRequest} btcAmount={btcAmount} onCancel={handleBack} />;
+      case 'unconfirmed':
+        return <UnconfirmedStep transaction={transaction} onBack={handleBack} />;
+      case 'confirmed':
+        return <ConfirmedStep transaction={transaction} btcAmount={btcAmount} onBack={handleBack} />;
+      case 'error':
+        return <ErrorStep onBack={handleBack} />;
+      default:
+        return <LoadingIcon />;
     }
   };
 
