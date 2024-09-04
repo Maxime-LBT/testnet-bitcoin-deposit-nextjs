@@ -76,7 +76,7 @@ const QRCodeStep: FC<QRCodeStepProps> = ({ paymentRequest, btcAmount, onCancel }
             </Space>
           </Col>
           <Col xs={{ span: 16, offset: 4 }} sm={{ span: 14, offset: 5 }} md={{ span: 14, offset: 5 }} lg={{ span: 14, offset: 5 }} xl={{ span: 14, offset: 5 }}>
-            <CancelButton type="primary" onClick={onCancel}>
+            <CancelButton id="cancel-transaction" type="primary" onClick={onCancel}>
               Cancel
             </CancelButton>
           </Col>
