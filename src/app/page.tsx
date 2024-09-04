@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef, FC } from 'react';
 import styled from 'styled-components';
-import { notification } from 'antd';
+import { notification, Result } from 'antd';
 import { LoadingOutlined } from '@ant-design/icons';
 import { AnimatePresence } from 'framer-motion';
 import { useWallet } from '@/context/walletContext';
@@ -20,12 +20,6 @@ const Container = styled.div`
   align-items: center;
   text-align: center;
   margin: 0 auto;
-`;
-
-const LoadingIcon = styled(LoadingOutlined)`
-  font-size: 64px;
-  color: #1677ff !important;
-  margin-top: 50px;
 `;
 
 // Types for components
@@ -69,8 +63,8 @@ const Home: FC = () => {
     }
 
     setBtcAmount(amount);
-    setPaymentRequest(`bitcoin:${wallet.address}?amount=${amount}`);
     setCurrentStep('showQRCode');
+    setPaymentRequest(`bitcoin:${wallet.address}?amount=${amount}`);
     pollPaymentStatus(wallet.address, amount);
   };
 
@@ -147,7 +141,7 @@ const Home: FC = () => {
       case 'error':
         return <ErrorStep onBack={handleBack} />;
       default:
-        return <LoadingIcon />;
+        return <Result icon={<LoadingOutlined />} subTitle="Loading the wallet information..." />;
     }
   };
 
