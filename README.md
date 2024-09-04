@@ -119,6 +119,7 @@ The GitHub Action will automatically deploy your application to Vercel whenever 
 - Add environment setting for the number of block confirmations to wait for before validating payment (currently set to 1).
 - Ensure payment confirmation by creating a new wallet for each payment request or using memo/label to avoid conflicts with the same amount transactions.
 - Integrate frontend logging with Sentry for enhanced monitoring and debugging.
+- Add more units and e2e tests, include e2e tests in the CI pipeline.
 
 ## Contributing
 
