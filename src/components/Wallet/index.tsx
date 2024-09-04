@@ -42,8 +42,8 @@ const Wallet: React.FC = () => {
   const fetchBalance = async (address: string) => {
     const response = await fetch(`/api/wallet/${address}`);
     const data = await response.json();
-    setBalance(data.data.balance);
-    setTransactions(data.data.transactions);
+    setBalance(data.data ? data.data.balance : -1);
+    setTransactions(data.data ? data.data.transactions : []);
   };
 
   return wallet.address ? (
