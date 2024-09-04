@@ -2,7 +2,7 @@
 
 import React from 'react';
 import styled from 'styled-components';
-import { Card, Row, Col, Space, Typography } from 'antd';
+import { Card, Row, Col, Space } from 'antd';
 import { Ubuntu } from 'next/font/google';
 import { AntdRegistry } from '@ant-design/nextjs-registry';
 import { DownloadOutlined, GithubFilled } from '@ant-design/icons';
@@ -10,6 +10,7 @@ import Wallet from '@/components/Wallet';
 import { WalletProvider } from '@/context/walletContext';
 import StyledJsxRegistry from './registry';
 import Link from 'next/link';
+import Title from 'antd/es/typography/Title';
 
 const ubuntu = Ubuntu({ subsets: ['latin'], weight: '300' });
 
@@ -73,7 +74,7 @@ export default function RootLayout({
                         title={
                           <Space align="baseline">
                             <DownloadOutlined style={{ fontSize: '24px' }} />
-                            <Typography.Title level={4}>Deposit</Typography.Title>
+                            <Title level={4}>Deposit</Title>
                           </Space>
                         }
                       >
