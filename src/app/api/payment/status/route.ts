@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
     const amountInSatoshis = Math.round(Number(amount) * 1e8); // 1e8 is 100000000
 
     // Fetch transactions for the given address
-    const { data: transactions } = await axios.get(`${process.env.EXPLORER_API_URL}/address/${address}/txs`);
+    const { data: transactions } = await axios.get(`${process.env.EXPLORER_API_URL}/api/address/${address}/txs`);
 
     // Find the transaction with the exact amount
     const matchingTransaction = transactions.find((tx: Transaction) => {

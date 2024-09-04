@@ -41,7 +41,7 @@ describe('ConfirmedStep Component', () => {
     // Check if the "View Transaction" button is rendered with the correct link
     const linkElement = screen.getByRole('link', { name: /view transaction/i });
     expect(linkElement).toBeInTheDocument();
-    expect(linkElement).toHaveAttribute('href', `https://blockstream.info/tx/${transactionId}`);
+    expect(linkElement).toHaveAttribute('href', `${process.env.NEXT_PUBLIC_EXPLORER_API_URL}/tx/${transactionId}`);
     expect(linkElement).toHaveAttribute('target', '_blank');
 
     // Check if the "Deposit Again" button is rendered

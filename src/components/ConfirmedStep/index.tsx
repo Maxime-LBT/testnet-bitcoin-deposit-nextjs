@@ -29,7 +29,7 @@ const ConfirmedStep: FC<ConfirmedStepProps> = ({ transaction, btcAmount, onBack 
           extra={[
             transaction ? (
               <Button type="primary" key="console">
-                <Link href={`https://blockstream.info/tx/${transaction}`} target="_blank">
+                <Link href={`${process.env.NEXT_PUBLIC_EXPLORER_API_URL}/tx/${transaction}`} target="_blank">
                   View Transaction
                 </Link>
               </Button>
