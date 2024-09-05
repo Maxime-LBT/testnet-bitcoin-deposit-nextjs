@@ -112,6 +112,7 @@ The GitHub Action will automatically deploy your application to Vercel whenever 
 
 - **Enter Payment Amount**: Use the provided form to specify the amount of BTC you wish to pay.
 - **Generate QR Code**: A QR code is generated for the payment request.
+- **Monitor Payment Status**: The payment status is continuously monitored in real-time.
 - **Retrieve Testnet BTC**: The private key/mnemonic is generated on the server and will be displayed.
 
 ## Future Improvements
