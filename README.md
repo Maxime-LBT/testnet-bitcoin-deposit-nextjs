@@ -42,8 +42,8 @@ Follow these steps to set up the project:
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/yourusername/qr-payment-app.git
-   cd qr-payment-app
+   git clone https://github.com/Maxime-LBT/testnet-bitcoin-deposit-nextjs
+   cd testnet-bitcoin-deposit-nextjs
    ```
 
 2. Install the dependencies:
